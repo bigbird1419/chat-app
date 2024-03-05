@@ -1,9 +1,8 @@
 import { memo } from "react"
-import classNames from "classnames/bind";
-import { Link } from "react-router-dom";
+import classNames from "classnames/bind"
+import { Link } from "react-router-dom"
 
 import styles from './DropdownMenu.module.css'
-import Button from "../Button";
 
 const cx = classNames.bind(styles)
 
@@ -24,9 +23,7 @@ function DropdownMenu({
                 if (el.href) {
                     return <a href={el.href} key={ind} className={classesChild}>{el.title}</a>
                 } else if (el.to) {
-                    return <Link to={el.to} key={ind} className={classesChild}>{el.title}</Link>
-                } else if (el.func) {
-                    return <Button onClick={el.func} key={ind} className={classesChild}>{el.title}</Button>
+                    return <Link onClick={el?.func} to={el.to} key={ind} className={classesChild}>{el.title}</Link>
                 } else {
                     return <div key={ind} className={classesChild}>{el.title}</div>
                 }

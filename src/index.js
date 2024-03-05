@@ -4,14 +4,14 @@ import reportWebVitals from './reportWebVitals';
 
 import './index.css';
 import App from './App';
-import { CurUserContext } from './contexts/curUserContext'
+import { AuthProvider } from './contexts/AuthContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <CurUserContext>
+    <AuthProvider>
       <App />
-    </CurUserContext>
+    </AuthProvider>
   </React.StrictMode>
 );
 

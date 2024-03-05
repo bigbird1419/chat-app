@@ -1,9 +1,9 @@
 import classNames from "classnames/bind"
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 
 import styles from './Home.module.css'
 import Button from "../../components/Button"
-
+import { AuthContext } from '../../contexts/AuthContext'
 
 const cx = classNames.bind(styles)
 const messages = [
@@ -60,15 +60,16 @@ export default function Home() {
     const [inpMes, setInpMes] = useState('')
     const [messages, setMessages] = useState([])
     const inpRef = useRef(null)
+    const { curUser } = useContext(AuthContext)
 
     const handleSendMessage = () => {
-        
+
         setInpMes('')
         inpRef.current.focus()
     }
 
     useEffect(() => {
-        
+
     }, [])
 
     return (

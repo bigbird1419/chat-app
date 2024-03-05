@@ -1,26 +1,33 @@
 import classNames from "classnames/bind"
 import { memo, useState } from 'react'
+import { debounce } from 'lodash'
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 import styles from './Search.module.css'
 import Button from "../../../components/Button"
+import { db } from '../../../services/firebase'
 
 const cx = classNames.bind(styles)
-const rsSearch = [
-    {
-        img: 'https://cdn-icons-png.flaticon.com/512/219/219969.png',
-        name: 'anthony'
-    },
-    {
-        img: 'https://cdn-icons-png.flaticon.com/512/219/219969.png',
-        name: 'anthony'
-    }
-]
+// const rsSearch = [
+//     {
+//         img: 'https://cdn-icons-png.flaticon.com/512/219/219969.png',
+//         name: 'anthony'
+//     },
+//     {
+//         img: 'https://cdn-icons-png.flaticon.com/512/219/219969.png',
+//         name: 'anthony'
+//     }
+// ]
 
 function Search({ onShow = () => { } }) {
     const [valSearch, setValSearch] = useState('')
+    const [rsSearch, setRsSearch] = useState([])
 
     const handleClearValSearch = () => {
         setValSearch('')
+    }
+    const handleSetValSearch = (e) => {
+        setValSearch(e.target.value)
     }
 
     return (
@@ -29,12 +36,14 @@ function Search({ onShow = () => { } }) {
                 <div onClick={onShow} className={cx('overlay', 'fixed top-0 right-0 bottom-0 left-0 bg-gray-500 opacity-80 z-40 transition-all duration-300')}></div>
                 <div className={cx('search-box', 'fixed top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] z-50')}>
                     <div className="rounded-md relative">
-                        <input className="min-w-80 px-4 py-2 text-md outline-none" placeholder="Enter name..." type="text" value={valSearch}
-                            onChange={e => setValSearch(e.target.value)}
+                        <input className="min-w-80 px-4 py-2 text-md outline-none"
+                            placeholder="Enter name..." type="text"
+                            value={valSearch}
+                            onChange={e => handleSetValSearch(e)}
                         />
                         {valSearch.length > 0 &&
                             <Button onClick={handleClearValSearch} className={cx('', 'absolute top-1/2 right-1 translate-y-[-50%] text-colorPrimary')}>
-                                <i class="far fa-times-circle"></i>
+                                <i className="far fa-times-circle"></i>
                             </Button>
                         }
                         <hr />

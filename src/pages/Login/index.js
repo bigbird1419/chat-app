@@ -1,24 +1,33 @@
 import classNames from 'classnames/bind'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
+import { useNavigate } from 'react-router-dom'
 
 import styles from './Login.module.css'
 import Button from '../../components/Button'
 import routes from '../../constants/routes'
 import { auth } from '../../services/firebase'
-import { CurUserContext } from '../../contexts/curUserContext'
 
 const cx = classNames.bind(styles)
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const { user } = useContext(CurUserContext)
+    const [isErr, setIsErr] = useState(false)
 
-    const hanldeSignIn = (e) => {
+    const navigate = useNavigate()
+
+    const hanldeSignIn = async (e) => {
         e.preventDefault()
-        const res = signInWithEmailAndPassword(auth, email, password)
-        console.log(res)
+        try {
+            await signInWithEmailAndPassword(auth, email, password)
+
+            setIsErr(false)
+            navigate('/')
+        } catch (error) {
+            console.log(error)
+            setIsErr(true)
+        }
     }
 
     return (
@@ -45,6 +54,11 @@ export default function Login() {
                                         Sign up?
                                     </Button>
                                 </div>
+                                {isErr &&
+                                    <div className='text-center mt-4'>
+                                        <span className='text-colorSecondary text-xl'>Loi vcl dcm</span>
+                                    </div>
+                                }
                             </div>
                             {/* <div className="form mt-10 flex flex-col justify-center items-center">
                                 <div className='min-w-80 flex justify-center items-center px-4 py-2 border text-colorPrimary border border-primary mb-4 cursor-pointer transition-all duration-300 rounded-sm hover:bg-colorPrimary hover:text-white'>
