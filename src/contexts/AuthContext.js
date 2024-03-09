@@ -10,7 +10,8 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, user => {
-            setCurUser(user)
+            const {displayName, email, uid, photoURL} = user
+            setCurUser({displayName, email, uid, photoURL})
         })
 
         return () => {

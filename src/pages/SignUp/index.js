@@ -2,13 +2,13 @@ import classNames from 'classnames/bind'
 import { useState } from 'react'
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { doc, setDoc } from "firebase/firestore"
+import { useNavigate } from 'react-router-dom'
 
 import styles from './SignUp.module.css'
 import Button from '../../components/Button'
 import routes from '../../constants/routes'
 import { auth, db } from '../../services/firebase'
 import userImg from '../../assets/user.jpg'
-import { useNavigate } from 'react-router-dom'
 
 const cx = classNames.bind(styles)
 
@@ -17,6 +17,7 @@ export default function SignUp() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [displayName, setDisplayName] = useState('')
+
     const navigate = useNavigate()
 
     const hanldeSignUp = async (e) => {
@@ -33,6 +34,7 @@ export default function SignUp() {
                 email,
                 photoURL: userImg
             })
+            await setDoc(doc(db, "userChats", res.user.uid), {})
             setIsErr(false)
             navigate('/')
         } catch (error) {

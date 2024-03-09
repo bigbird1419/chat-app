@@ -1,33 +1,67 @@
 import classNames from "classnames/bind"
-import { memo, useState } from 'react'
-import { debounce } from 'lodash'
-import { collection, getDocs, query, where } from "firebase/firestore"
+import { memo, useCallback, useContext, useState } from 'react'
+import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore"
 
 import styles from './Search.module.css'
 import Button from "../../../components/Button"
 import { db } from '../../../services/firebase'
+import { AuthContext } from '../../../contexts/AuthContext'
 
 const cx = classNames.bind(styles)
-// const rsSearch = [
-//     {
-//         img: 'https://cdn-icons-png.flaticon.com/512/219/219969.png',
-//         name: 'anthony'
-//     },
-//     {
-//         img: 'https://cdn-icons-png.flaticon.com/512/219/219969.png',
-//         name: 'anthony'
-//     }
-// ]
 
 function Search({ onShow = () => { } }) {
     const [valSearch, setValSearch] = useState('')
-    const [rsSearch, setRsSearch] = useState([])
+    const [user, setUser] = useState()
+    const { curUser } = useContext(AuthContext)
 
-    const handleClearValSearch = () => {
+    const handleClearValSearch = useCallback(() => {
         setValSearch('')
-    }
-    const handleSetValSearch = (e) => {
+    }, [])
+    const handleSetValSearch = useCallback((e) => {
         setValSearch(e.target.value)
+    }, [])
+    const hanldeSearch = async () => {
+        const q = query(collection(db, 'users'), where('displayName', '==', valSearch))
+        try {
+            const querySnapshot = await getDocs(q)
+            querySnapshot.forEach(doc => {
+                setUser(doc.data())
+            })
+        } catch (error) {
+
+        }
+    }
+    const handleKeydown = (e) => {
+        e.code === "Enter" && valSearch.length > 0 && hanldeSearch()
+    }
+    const handleSelect = async () => {
+        const combineId = curUser.uid > user.uid ? curUser.uid + user.uid : user.uid + curUser.uid
+        try {
+            const res = await getDoc(doc(db, 'chats', combineId))
+            if (!res.exists()) {
+                await setDoc(doc(db, 'chats', combineId), { messages: [] })
+
+                await updateDoc(doc(db, 'userChats', curUser.uid), {
+                    [combineId + '.userInfo']: {
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL
+                    },
+                    [combineId + '.date']: serverTimestamp()
+                })
+                await updateDoc(doc(db, 'userChats', user.uid), {
+                    [combineId + '.userInfo']: {
+                        uid: curUser.uid,
+                        displayName: curUser.displayName,
+                        photoURL: curUser.photoURL
+                    },
+                    [combineId + '.date']: serverTimestamp()
+                })
+            }
+        } catch (error) {
+            throw error
+        }
+        onShow()
     }
 
     return (
@@ -40,6 +74,7 @@ function Search({ onShow = () => { } }) {
                             placeholder="Enter name..." type="text"
                             value={valSearch}
                             onChange={e => handleSetValSearch(e)}
+                            onKeyDown={e => handleKeydown(e)}
                         />
                         {valSearch.length > 0 &&
                             <Button onClick={handleClearValSearch} className={cx('', 'absolute top-1/2 right-1 translate-y-[-50%] text-colorPrimary')}>
@@ -48,16 +83,15 @@ function Search({ onShow = () => { } }) {
                         }
                         <hr />
                     </div>
-                    {rsSearch.length > 0 &&
-                        <div className={cx('rs-search', 'bg-white px-4 py-2')}>
-                            {rsSearch.map((el, ind) => {
-                                return (
-                                    <div className="flex items-center mb-2" key={ind}>
-                                        <img className="w-10" src={el.img} alt="user" />
-                                        <h3 className="ml-4 text-colorPrimary font-normal text-md">{el.name}</h3>
-                                    </div>
-                                )
-                            })}
+                    {user &&
+                        <div className={cx('rs-search', 'bg-white px-4 py-2 cursor-pointer')}>
+                            <div
+                                onClick={handleSelect}
+                                className="flex items-center mb-2" key={user.uid}
+                            >
+                                <img className="w-10 rounded-full" src={user.photoURL} alt="user" />
+                                <h3 className="ml-4 text-colorPrimary font-normal text-md uppercase">{user.displayName}</h3>
+                            </div>
                         </div>}
                 </div>
             </div>
