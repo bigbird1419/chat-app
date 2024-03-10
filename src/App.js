@@ -4,30 +4,21 @@ import { useContext } from 'react';
 import './App.css';
 import { publicRoutes } from './routes'
 import DefaultLayout from './layouts/DefaultLayout'
-import { AuthContext } from './contexts/AuthContext'
-import Home from './pages/Home';
+import { AuthContext } from './contexts/AuthContext';
 
 function App() {
   const { curUser } = useContext(AuthContext)
-  const ProtectedRoute = ({ children }) => {
-    if (!curUser) {
-      return <Navigate to={'/login'} />
-    }
-    return children
-  }
 
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route index element={
-            <ProtectedRoute>
-              <DefaultLayout>
-                <Home />
-              </DefaultLayout>
-            </ProtectedRoute>
-          } />
           {publicRoutes.map((route, ind) => {
+            // console.log(Object.keys(curUser).length)
+            // if (Object.keys(curUser).length === 0) {
+            //   return <Navigate key={ind} to='/login' />
+            // }
+
             const Page = route.component
             let Layout = DefaultLayout
             if (route.layout) {

@@ -13,7 +13,7 @@ function Messages({ message }) {
     const messRef = useRef()
 
     useEffect(() => {
-        messRef.current?.scrollIntoView({ behavior: 'smooth' })
+        // messRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [message])
 
     return (

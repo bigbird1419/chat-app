@@ -14,12 +14,15 @@ const cx = classNames.bind(styles)
 export default function Header() {
     const [isShowSeachBox, setIsShowSeachBox] = useState(false)
     const [isShowDropMenu, setIsShowDropMenu] = useState(false)
-    const {curUser} = useContext(AuthContext)
+    const { curUser, setCurUser } = useContext(AuthContext)
     const contentDropMenu = [
         {
             title: 'Log out',
             to: '/login',
-            func: () => signOut(auth)
+            func: () => {
+                signOut(auth)
+                setCurUser({})
+            }
         }
     ]
 
